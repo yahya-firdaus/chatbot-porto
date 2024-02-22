@@ -10,6 +10,49 @@
 </body>
 <script type="text/javascript">
 	// Baca file JSON yang berisi model
+class NaiveBayesClassifier {
+    constructor() {
+        this.classCounts = {};
+        this.featureCounts = {};
+        this.featureProbabilities = {};
+    }
+
+    train(data) {
+        data.forEach(entry => {
+            const { features, label } = entry;
+            if (!this.classCounts[label]) this.classCounts[label] = 0;
+            this.classCounts[label]++;
+            features.forEach(feature => {
+                if (!this.featureCounts[feature]) this.featureCounts[feature] = {};
+                if (!this.featureCounts[feature][label]) this.featureCounts[feature][label] = 0;
+                this.featureCounts[feature][label]++;
+            });
+        });
+
+        Object.keys(this.featureCounts).forEach(feature => {
+            this.featureProbabilities[feature] = {};
+            Object.keys(this.classCounts).forEach(label => {
+                const count = this.featureCounts[feature][label] || 0;
+                const total = this.classCounts[label];
+                this.featureProbabilities[feature][label] = count / total;
+            });
+        });
+    }
+
+    classify(input) {
+        const labelScores = {};
+        Object.keys(this.classCounts).forEach(label => {
+            labelScores[label] = 0;
+            input.forEach(feature => {
+                if (this.featureProbabilities[feature] && this.featureProbabilities[feature][label]) {
+                    labelScores[label] += Math.log(this.featureProbabilities[feature][label]);
+                }
+            });
+            labelScores[label] += Math.log(this.classCounts[label]);
+        });
+        return Object.keys(labelScores).reduce((bestLabel, label) => labelScores[label] > labelScores[bestLabel] ? label : bestLabel);
+    }
+}
 	fetch('naive_bayes_model.json')
 	  .then(response => response.json())
 	  .then(modelData => {
