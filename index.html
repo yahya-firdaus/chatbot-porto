@@ -6,37 +6,14 @@
 	<title></title>
 </head>
 <body>
-	<p id="test">TESTING 002</p>
+	<p id="test">TESTING 003</p>
 </body>
 <script type="text/javascript">
 	// Baca file JSON yang berisi model
 class NaiveBayesClassifier {
-    constructor() {
-        this.classCounts = {};
-        this.featureCounts = {};
-        this.featureProbabilities = {};
-    }
-
-    train(data) {
-        data.forEach(entry => {
-            const { features, label } = entry;
-            if (!this.classCounts[label]) this.classCounts[label] = 0;
-            this.classCounts[label]++;
-            features.forEach(feature => {
-                if (!this.featureCounts[feature]) this.featureCounts[feature] = {};
-                if (!this.featureCounts[feature][label]) this.featureCounts[feature][label] = 0;
-                this.featureCounts[feature][label]++;
-            });
-        });
-
-        Object.keys(this.featureCounts).forEach(feature => {
-            this.featureProbabilities[feature] = {};
-            Object.keys(this.classCounts).forEach(label => {
-                const count = this.featureCounts[feature][label] || 0;
-                const total = this.classCounts[label];
-                this.featureProbabilities[feature][label] = count / total;
-            });
-        });
+    constructor(features, labels) {
+        this.featureProbabilities = features;
+        this.classCounts = labels;
     }
 
     classify(input) {
@@ -66,7 +43,7 @@ class NaiveBayesClassifier {
 	    const text = "Berapa umur kamu";
 
 	    // Lakukan klasifikasi teks
-	    const classification = classifier.classify(text);
+	    const classification = classifier.classify([text]);
 	    console.log('Classification:', classification);
 	  })
 	  .catch(error => console.error('Error loading model:', error));
