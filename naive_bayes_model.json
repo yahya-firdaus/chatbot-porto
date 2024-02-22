@@ -1,0 +1,32 @@
+{
+    "feature_set": [
+        [
+            "namamu",
+            false
+        ],
+        [
+            "umur",
+            false
+        ],
+        [
+            "umurmu",
+            false
+        ],
+        [
+            "namamu",
+            true
+        ],
+        [
+            "umur",
+            true
+        ],
+        [
+            "umurmu",
+            true
+        ]
+    ],
+    "labels": [
+        "nama",
+        "umur"
+    ]
+}
