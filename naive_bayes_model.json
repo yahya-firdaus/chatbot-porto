@@ -1,32 +1,65 @@
 {
     "feature_set": [
-        [
-            "namamu",
-            false
-        ],
-        [
-            "umur",
-            false
-        ],
-        [
-            "umurmu",
-            false
-        ],
-        [
-            "namamu",
-            true
-        ],
-        [
-            "umur",
-            true
-        ],
-        [
-            "umurmu",
-            true
-        ]
+        {
+            "text": "pengalaman",
+            "include": false
+        },
+        {
+            "text": "namamu",
+            "include": false
+        },
+        {
+            "text": "umur",
+            "include": false
+        },
+        {
+            "text": "umurmu",
+            "include": false
+        },
+        {
+            "text": "memiliki",
+            "include": false
+        },
+        {
+            "text": "miliki",
+            "include": false
+        },
+        {
+            "text": "pengalamanmu",
+            "include": false
+        },
+        {
+            "text": "memiliki",
+            "include": true
+        },
+        {
+            "text": "miliki",
+            "include": true
+        },
+        {
+            "text": "namamu",
+            "include": true
+        },
+        {
+            "text": "pengalaman",
+            "include": true
+        },
+        {
+            "text": "pengalamanmu",
+            "include": true
+        },
+        {
+            "text": "umur",
+            "include": true
+        },
+        {
+            "text": "umurmu",
+            "include": true
+        }
     ],
     "labels": [
         "nama",
-        "umur"
+        "umur",
+        "pengalaman"
     ]
 }
