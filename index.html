@@ -6,46 +6,131 @@
 	<title></title>
 </head>
 <body>
-	<p id="test">TESTING 003</p>
+	<p id="test">TESTING 002</p>
 </body>
 <script type="text/javascript">
 	// Baca file JSON yang berisi model
+// const fs = require('fs');
 class NaiveBayesClassifier {
-    constructor(features, labels) {
-        this.featureProbabilities = features;
-        this.classCounts = labels;
+    constructor(model) {
+        this.labels = model.labels;
+        this.keywords = model.feature_set.filter(({ include }) => include).map(({ text }) => text);
+        this.classFeatureCounts = {};
+        this.classCounts = {};
+        this.totalDocuments = 0;
     }
 
-    classify(input) {
-        const labelScores = {};
-        Object.keys(this.classCounts).forEach(label => {
-            labelScores[label] = 0;
-            input.forEach(feature => {
-                if (this.featureProbabilities[feature] && this.featureProbabilities[feature][label]) {
-                    labelScores[label] += Math.log(this.featureProbabilities[feature][label]);
+    train(documents) {
+        documents.forEach(({ text, label }) => {
+            if (!this.classFeatureCounts[label]) {
+                this.classFeatureCounts[label] = {};
+                this.classCounts[label] = 0;
+            }
+            this.classCounts[label]++;
+            this.totalDocuments++;
+            this.keywords.forEach(keyword => {
+                if (text.includes(keyword)) {
+                    if (!this.classFeatureCounts[label][keyword]) {
+                        this.classFeatureCounts[label][keyword] = 0;
+                    }
+                    this.classFeatureCounts[label][keyword]++;
                 }
             });
-            labelScores[label] += Math.log(this.classCounts[label]);
         });
-        return Object.keys(labelScores).reduce((bestLabel, label) => labelScores[label] > labelScores[bestLabel] ? label : bestLabel);
+    }
+
+    classify(text) {
+        const words = text.split(/\s+/);
+        let maxProb = -Infinity;
+        let predictedLabel = null;
+
+        for (const label of this.labels) {
+            const classCount = this.classCounts[label];
+            let prob = Math.log(classCount / this.totalDocuments);
+            this.keywords.forEach(keyword => {
+                const featureCount = this.classFeatureCounts[label][keyword] || 0;
+                const wordProb = (featureCount + 1) / (classCount + 2); // Laplace smoothing
+                if (text.includes(keyword)) {
+                    prob += Math.log(wordProb);
+                } else {
+                    prob += Math.log(1 - wordProb);
+                }
+            });
+            if (prob > maxProb) {
+                maxProb = prob;
+                predictedLabel = label;
+            }
+        }
+        return predictedLabel;
     }
 }
-	fetch('naive_bayes_model.json')
-	  .then(response => response.json())
-	  .then(modelData => {
-	    // Parsing data model
-	    const features = modelData.features;
-	    const labels = modelData.labels;
-	    // Inisialisasi model Naive Bayes untuk NLU
-	    const classifier = new NaiveBayesClassifier(features, labels);
 
-	    // Contoh teks yang akan diproses
-	    const text = "Berapa umur kamu";
+// // Baca model dari file JSON
+// const filePath = './naive_bayes_model.json';
 
-	    // Lakukan klasifikasi teks
-	    const classification = classifier.classify([text]);
-	    console.log('Classification:', classification);
-	  })
-	  .catch(error => console.error('Error loading model:', error));
+// // Fetch JSON data from the file
+// fetch(filePath)
+//   .then(response => {
+//     // Check if the response is successful
+//     if (!response.ok) {
+//       throw new Error('Network response was not ok');
+//     }
+//     // Parse the JSON response
+//     return response.json();
+//   })
+//   .then(jsonData => {
+//     // Use the parsed JSON data
+//     console.log('JSON data:', jsonData);
+//   })
+//   .catch(error => {
+//     // Handle errors
+//     console.error('Error fetching or parsing JSON:', error);
+//   });
+
+// const modelPath = './naive_bayes_model.json';
+// const modelData = fs.readFileSync(modelPath);
+// const model = JSON.parse(modelData);
+
+// Contoh data latih
+const trainingData = [
+    { text: "Siapa namamu?", label: "nama" },
+    { text: "Siapa kamu?", label: "nama" },
+    { text: "Namamu siapa", label: "nama" },
+    { text: "Umur kamu berapa?", label: "umur" },
+    { text: "Berapa umurmu", label: "umur" },
+    { text: "Apa saja pengalamanmu?", label: "pengalaman" },
+    { text: "Apa pengalaman kamu", label: "pengalaman" },
+    { text: "Apakah kamu memiliki pengalaman", label: "pengalaman" },
+    { text: "Pengalaman apa yang kamu miliki?", label: "pengalaman" }
+];
+
+// Membuat dan melatih klasifier
+// const classifier = new NaiveBayesClassifier(model);
+// classifier.train(trainingData);
+
+// Data uji
+const testText = "Namamu siapa";
+
+// Klasifikasi
+// const predictedLabel = classifier.classify(testText);
+// console.log(`Predicted label for "${testText}": ${predictedLabel}`);
+
+
+        function fetchJSONData() {
+            fetch("./naive_bayes_model.json")
+                .then((res) => {
+                    if (!res.ok) {
+                        throw new Error
+                            (`HTTP error! Status: ${res.status}`);
+                    }
+                    return res.json();
+                })
+                .then((data) => 
+                      console.log(data))
+                .catch((error) => 
+                       console.error("Unable to fetch data:", error));
+        }
+        fetchJSONData();
+
 </script>
 </html>
